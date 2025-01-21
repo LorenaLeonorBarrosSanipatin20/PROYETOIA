@@ -1,0 +1,32 @@
+image: python:3.9-slim
+
+stages:
+  - build
+  - test
+  - deploy
+
+cache:
+  paths:
+    - venv/
+
+build:
+  stage: build
+  script:
+    - python -m venv venv
+    - . venv/bin/activate
+    - pip install -r requirements.txt
+    - flask run --port 5000
+
+test:
+  stage: test
+  script:
+    - . venv/bin/activate
+    - pytest
+
+deploy:
+  stage: deploy
+  script:
+    - . venv/bin/activate
+    - git archive --format=tar HEAD | ssh user@your_server "cd /var/www/your_app && tar xf - && pip install -r requirements.txt"
+  only:
+    - main
